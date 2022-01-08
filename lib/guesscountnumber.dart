@@ -1,17 +1,41 @@
 // ignore_for_file: avoid_print
 
 import 'dart:io';
-import 'dart:ui';
-
-import 'package:guess_number/game.dart';
+import 'game.dart';
 
 void main() {
-  const maxRandom = 100;
-  var game = Game();
+  while (true) {
+    playGame();
+    String? input;
 
+    do {
+      stdout.write('Play again? (Y/N): ');
+      input = stdin.readLineSync();
+    } while (input!.toLowerCase() != 'y' && input.toLowerCase() != 'n');
+
+    if (input.toLowerCase() == 'n') break;
+  }
+
+  print('\n\nYou\'ve played ${Game.guessCountList.length} games');
+  for (var i = 0; i < Game.guessCountList.length; i++) {
+    print('🚀 Game #${i + 1}: ${Game.guessCountList[i]} guesses');
+  }
+
+
+}
+
+void playGame() {
+  int? maxRandom;
+  do {
+    stdout.write('\nEnter a maximum number to random: ');
+    var input = stdin.readLineSync();
+    maxRandom = int.tryParse(input!);
+  } while (maxRandom == null);
+
+  var game = Game(maxRandom: maxRandom);
   var isCorrect = false;
-  var guessCount = 0;
 
+  print('');
   print('╔════════════════════════════════════════');
   print('║            GUESS THE NUMBER            ');
   print('╟────────────────────────────────────────');
@@ -24,8 +48,6 @@ void main() {
       continue;
     }
 
-    guessCount++;
-
     var result = game.doGuess(guess);
 
     if (result == 1) {
@@ -34,22 +56,12 @@ void main() {
     } else if (result == -1) {
       print('║ ➜ $guess is TOO LOW! ▼');
       print('╟────────────────────────────────────────');
-    } else {
-      print('║ ➜ $guess is CORRECT ❤, total guesses: $guessCount');
+    } else if (result == 0) {
+      print('║ ➜ $guess is CORRECT ❤, total guesses: ${game.guessCount}');
       print('╟────────────────────────────────────────');
-
-    }
-
-    if (isCorrect) {
-      stdout.write('Play again? (Y/N): ');
-      var input2 = stdin.readLineSync();
-      var guess2 = input2.toString();
-
-      if (guess2 == 'Y' || guess2 == 'y') {
-        continue;
-      } else if(guess2 == 'N' || guess2 == 'n') {
-        isCorrect = true;
-      }
+      isCorrect = true;
+      //Game.guessCountList.add(game.guessCount);
+      game.addCountList();
     }
   } while (!isCorrect);
 
